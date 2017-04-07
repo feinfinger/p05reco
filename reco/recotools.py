@@ -5,9 +5,15 @@ from datetime import date
 import sys
 from p05tools.file import read_dat
 
-logging.basicConfig(level=logging.INFO)
 
-def rebin_stack(arr, factor):
+logger = logging.getLogger('reco_logger')
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging_sh = logging.StreamHandler()
+logging_sh.setLevel(logging.DEBUG)
+logging_sh.setFormatter(formatter)
+logger.addHandler(logging_sh)
+
+def rebin_stack(arr, factor, descriptor=''):
     """
     Binning of the 2nd and 3rd dimension of a 3d array
 
@@ -22,6 +28,7 @@ def rebin_stack(arr, factor):
     # throws away right and/or bottom edge, if binning does not fit to array
     arr = arr[:, :factor * new_shape[1], :factor * new_shape[2]]
     shape = (arr.shape[0], new_shape[1], factor, new_shape[2], factor)
+    logger.info('Rebin array {} by factor {}'.format(descriptor, factor))
     return arr.reshape(shape).mean(-1).mean(-2)
 
 
@@ -80,8 +87,8 @@ def get_paths(scanname, foldername=None, year=date.today().year, application_num
         else:
             reco_dir = basepath + 'commissioning/' + commissioning + '/processed/' + scanname + '/'
 
-    logging.info('raw_dir : %s' % raw_dir)
-    logging.info('reco_dir : %s' % reco_dir)
+    logger.info('raw_dir : %s' % raw_dir)
+    logger.info('reco_dir : %s' % reco_dir)
 
     return raw_dir, reco_dir
 
@@ -130,6 +137,11 @@ def get_rawdata(scanlog_content, raw_dir, verbose=False):
     dark = numpy.asarray(darklist, dtype=numpy.uint16)
     theta = numpy.asarray([float(item['imageangle']) * numpy.pi / 180.0 for item in proj_metadata],
                           dtype=numpy.float32)
+
+    logger.info('loaded raw data proj with shape: %s' % str(proj.shape))
+    logger.info('loaded raw data flat with shape: %s' % str(flat.shape))
+    logger.info('loaded raw data dark with shape: %s' % str(dark.shape))
+    logger.info('loaded raw data theta with number of angles: %g' % len(theta))
 
     return proj, flat, dark, theta
 
@@ -205,6 +217,7 @@ def correrlate_flat(proj, flat, verbose=False):
 def normalize_corr(proj, flat, dark, flat_with_min, cutoff=None, ncore=None, out=None):
     """
     Normalize raw projection data based on best correlation between projections and flat field images
+    
     :param proj: <ndarray>
         3D stack of projections
     :param flat: <ndarray>
@@ -263,3 +276,33 @@ def chunk_reconstruct(chunksize, *args, **kwargs):
         rec[a:b, :] = tomopy.recon(proj[:, a:b], *args, **kwargs)
 
     return rec
+
+def init_filelog(identifier, scanname, recodir):
+    """
+    Initializes a logger for reconstruction.
+    
+    :param identifier: <int> or <str>
+        application_number or commissiong identifier of the current project
+    :param scanname: <str>
+        Scanname as in the raw data
+    :param recodir: <str>
+        path to the reconstruction folder
+        
+    :return <instance>
+        logger instance
+    """
+    logger = logging.getLogger('reco_logger')
+    logger.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    fh = logging.FileHandler(recodir + 'reco.log')
+    fh.setLevel(logging.DEBUG)
+    fh.setFormatter(formatter)
+    logger.addHandler(fh)
+
+    logger.info('===============================================')
+    logger.info('Started new reco run')
+    logger.info('===============================================')
+    logger.info('scanname: {}'.format(scanname))
+    logger.info('application number: {}'.format(identifier))
+
+    return logger

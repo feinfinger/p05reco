@@ -3,7 +3,9 @@ import datetime
 import numpy
 import os
 from io import open
+import logging
 
+logger = logging.getLogger('reco_logger')
 
 def parse_scanlog(path):
     """
@@ -18,6 +20,7 @@ def parse_scanlog(path):
             * imageinfo: Imagenumber, Imagename, Imagetype, corresponding angle and PETRA current and timestamps per image
             * petracurrent: PETRA current, timestamps for the whole scan.
     """
+
 
     overview = {}
     imageinfo = {}
@@ -136,5 +139,7 @@ def parse_scanlog(path):
     petracurrent['t_ss'] = t_ss
     petracurrent['t_p3i'] = t_p3i
     petracurrent['t_tine'] = t_tine
+
+    logger.info('raw scanlog: {}'.format(path))
 
     return {'overview': overview, 'imageinfo': imageinfo, 'petracurrent': petracurrent}
