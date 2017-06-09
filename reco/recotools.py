@@ -59,7 +59,8 @@ def get_paths(scanname, foldername=None, year=date.today().year, application_num
     :param scanname: <string>
         name on the scan (defined by raw data)
     :param foldername: <string> (optional)
-        name of folder, where the processed data should go
+        name of folder, where the processed data should go. Omitting foldername
+        will set the foldername to the scanname
     :param year: <int> (optional)
         year in which the raw data was taken (defaults to current year)
     :param application_number: <int> or <None>
@@ -113,7 +114,7 @@ def get_rawdata(scanlog_content, raw_dir, verbose=False):
     counter = float(0)
     projlist, flatlist, darklist = list(), list(), list()
     proj_metadata = list()
-
+ 
     for image_number, logcontent in sorted(imageinfo.items()):
         if verbose:
             counter += 1
