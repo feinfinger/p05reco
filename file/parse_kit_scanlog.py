@@ -4,7 +4,6 @@ import numpy
 import os
 from io import open
 import logging
-import pdb
 
 logger = logging.getLogger('reco_logger')
 
@@ -23,7 +22,6 @@ def parse_kit_scanlog(path):
     with open(path, encoding='latin-1') as f:
         log = f.readlines()
 
-    pdb.set_trace()
     log_dict = {}
     for line in log:
         # remove newline and slpit at =
