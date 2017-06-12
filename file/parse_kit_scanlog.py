@@ -10,24 +10,26 @@ logger = logging.getLogger('reco_logger')
 
 def parse_kit_scanlog(path):
     """
-    Parses IDL generated scan.log files frim kit scan script and returns
-    content as a dictionary:
+    Parses IDL generated scan.log files from kit scan script and returns
+    content as a dictionary.
 
     :param path: <string>
         full path to the scanlog file
 
-    :return: scanlog_info: <dict>
+    :return: <dict>
     """
 
 
     with open(path, encoding='latin-1') as f:
         log = f.readlines()
-    
+
     pdb.set_trace()
     log_dict = {}
     for line in log:
+        # remove newline and slpit at =
         log_item = line.strip("\n").split('=')
         log_key = log_item[0]
+        # an array can start with a comma - strip that
         if log_item[1][0] == ',':
             log_item[1] = log_item[1][1::]
         try:
@@ -36,6 +38,7 @@ def parse_kit_scanlog(path):
         except ValueError:
             try:
                 log_value = numpy.fromstring(log_item[1], sep=',')
+                # strings are read in as empty arrays withe numpy.fromstring
                 if log_value.size == 0:
                     raise ValueError
                 log_dict[log_key] = log_value
