@@ -36,8 +36,8 @@ def parse_kit_scanlog(path):
         except ValueError:
             try:
                 log_value = numpy.fromstring(log_item[1], sep=',')
-                # strings are read in as empty arrays withe numpy.fromstring
-                if log_value.size == 0:
+                # strings are read in as [-1] arrays with the numpy.fromstring
+                if not isinstance(log_value[0],str):
                     raise ValueError
                 log_dict[log_key] = log_value
             except ValueError:

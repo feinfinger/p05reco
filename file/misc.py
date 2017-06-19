@@ -16,3 +16,6 @@ def mkdir(foldername):
             pass
         else:
             raise
+
+def find(path, pattern):
+    return glob(path, pattern)

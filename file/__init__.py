@@ -8,6 +8,6 @@ from p05tools.file.parse_scanlog import parse_scanlog
 from p05tools.file.parse_kit_scanlog import parse_kit_scanlog
 from p05tools.file.idl_h5 import Idl2H5
 from p05tools.file.readh5 import readh5
-from p05tools.file.mkdir import mkdir
+from p05tools.file.misc import mkdir, find
 
-__all__ = ['read_dat', 'parse_scanlog', 'Idl2H5', 'readh5', 'mkdir']
+__all__ = ['read_dat', 'parse_scanlog', 'Idl2H5', 'readh5', 'misc']
