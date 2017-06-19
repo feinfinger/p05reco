@@ -1,5 +1,6 @@
 import os
 import errno
+import glob
 
 
 def mkdir(foldername):
@@ -17,5 +18,5 @@ def mkdir(foldername):
         else:
             raise
 
-def find(path, pattern):
-    return glob(path, pattern)
+def find(pattern):
+    return glob.glob(pattern)
