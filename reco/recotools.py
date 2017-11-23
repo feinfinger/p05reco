@@ -6,12 +6,24 @@ import sys
 from p05tools.file import read_dat
 
 
+class p05recon():
+    """
+    Class to generate P05 reconstruction objects.
+    """
+
+    def __init__(self, ApplicationID):
+       # Gather information about the Application
+       self.rawDataPath = p05tools.findApplcationData(ApplicationID)
+
+
+
 logger = logging.getLogger('reco_logger')
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logging_sh = logging.StreamHandler()
 logging_sh.setLevel(logging.DEBUG)
 logging_sh.setFormatter(formatter)
 logger.addHandler(logging_sh)
+
 
 def rebin_stack(arr, factor, descriptor=''):
     """
