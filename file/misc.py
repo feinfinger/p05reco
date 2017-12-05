@@ -58,13 +58,14 @@ def gpfsFindIdentifier(identifier, basepath='/asap3/petra3/gpfs/p05/'):
     # find identifier and return result or raise error if none / too many
     # instances were found
     num_occur = 0
+    occur_paths = str()
     for item in result:
         if item.find(str(identifier)) > -1:
             result_path = item + os.sep
+            occur_paths += '\t' + result_path + '\n'
             num_occur +=1
 
     if num_occur != 1:
-        raise ValueError('found {} ocurrences of identifier or' +
-                'Commissioning Tag {}'.format(num_occur, identifier))
+        raise ValueError('found {0} ocurrences of identifier or Commissioning Tag {1}:\n{2}'.format(num_occur, identifier, occur_paths))
 
     return result_path
