@@ -60,7 +60,7 @@ def gpfsFindIdentifier(identifier, basepath='/asap3/petra3/gpfs/p05/'):
     num_occur = 0
     for item in result:
         if item.find(str(identifier)) > -1:
-            result_path = item
+            result_path = item + os.sep
             num_occur +=1
 
     if num_occur != 1:
