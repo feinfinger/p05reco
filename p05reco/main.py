@@ -5,7 +5,8 @@ from datetime import date
 import sys
 from p05reco.lib import findIdentifier, mkdir
 import os
-import configobj
+from configobj import ConfigObj
+import p05reco
 
 
 class recoObject():
@@ -22,7 +23,9 @@ class recoObject():
 
         # read config file
         with open(configPath) as f:
-            self.config = ruamel_yaml.load(f)
+            specfile = p05reco.__configfile__
+            print(specfile)
+            self.config = ConfigObj(f, configspec=specfile)
 
         # find path of the identifier in gpfs file system
         self.identifierPath = findIdentifier(self.config['scan']['identifier'])
