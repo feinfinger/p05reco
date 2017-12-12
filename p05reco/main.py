@@ -6,6 +6,7 @@ import sys
 from p05reco.lib import findIdentifier, mkdir
 import os
 from configobj import ConfigObj
+from validate import Validator
 import p05reco
 
 
@@ -24,8 +25,11 @@ class recoObject():
         # read config file
         with open(configPath) as f:
             specfile = p05reco.__configfile__
-            print(specfile)
             self.config = ConfigObj(f, configspec=specfile)
+
+        # convert config string values to actual values
+        validator = Validator()
+        self.config.validate(validator)
 
         # find path of the identifier in gpfs file system
         self.identifierPath = findIdentifier(self.config['scan']['identifier'])
