@@ -1,28 +1,7 @@
 import os
-import errno
-import glob
 
 
-def mkdir(foldername):
-    """
-    Creates a folder at the given location. Parent paths are created as well,
-    if necessary.
-
-    :param foldername: <str>
-        Name of the folder that is to be created
-    """
-    try:
-        os.makedirs(foldername)
-    except OSError as exc:
-        if exc.errno == errno.EEXIST and os.path.isdir(foldername):
-            pass
-        else:
-            raise
-
-def find(pattern):
-    return glob.glob(pattern)
-
-def gpfsFindIdentifier(identifier, basepath='/asap3/petra3/gpfs/p05/'):
+def findIdentifier(identifier, basepath='/asap3/petra3/gpfs/p05/'):
     """
     Searches the gpfs p05 folder for the filepath of a given application ID
     or commissioning tag. Returns full path if application ID or commissioning
@@ -48,7 +27,7 @@ def gpfsFindIdentifier(identifier, basepath='/asap3/petra3/gpfs/p05/'):
     result = []
     for year in years_dirs:
         for beamtime_type in ['data', 'commissioning']:
-            lookup_path = basepath + os.sep + year + os.sep + beamtime_type + os.sep
+            lookup_path = basepath + year + os.sep + beamtime_type + os.sep
             appid_dirs = [lookup_path + name for name in
                     os.listdir(lookup_path) if os.path.isdir(lookup_path +
                         name)]

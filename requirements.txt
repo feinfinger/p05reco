@@ -1,0 +1,4 @@
+p05reco needs a working version of tomopy to be installed.
+For installation see:
+
+https://github.com/tomopy/tomopy

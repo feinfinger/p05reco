@@ -3,22 +3,49 @@ import numpy
 import logging
 from datetime import date
 import sys
-from p05tools.file import read_dat
+from p05reco.lib import findIdentifier, mkdir
 import os
+import configobj
 
 
-class p05recon():
+class recoObject():
     """
     Class to generate P05 reconstruction objects.
     """
 
-    def __init__(self, identifier, scanname, recoPath = None):
-        # Gather information about the Application
-        self.identifierPath = p05tools.file.gpfsFindIdentifier(identifier)
-        self.rawDataPath = self.identifierPath + 'raw' + os.sep + identifier
-        if not recoPath:
-            self.recoPath = self.identifierPath + 'processed' + identifier
-        p05tools.file.mkdir(self.recoPath)
+    def __init__(self, configPath):
+        """
+        Reads config file and stores content as internal variable.
+        """
+
+        self.configPath = configPath
+
+        # read config file
+        with open(configPath) as f:
+            self.config = ruamel_yaml.load(f)
+
+        # find path of the identifier in gpfs file system
+        self.identifierPath = findIdentifier(self.config['scan']['identifier'])
+
+        # set standard raw file path if none is give in the config file
+        if not self.config['scan']['path']:
+            self.config['scan']['path'] = (self.identifierPath + 'raw' + os.sep
+                                           + self.config['scan']['name'] +
+                                           os.sep)
+            self.alter_config()
+
+        # set standard output file path if none is give in the config file
+        if not self.config['output']['path']:
+            self.config['output']['path'] = (self.identifierPath + 'processed'
+                                             + os.sep +
+                                             self.config['scan']['name'])
+            self.alter_config()
+
+        mkdir(self.config['output']['path'])
+
+    def alter_config(self):
+        with open(self.configPath, 'w') as f:
+            ruamel_yaml.dump(self.config, f)
 
 logger = logging.getLogger('reco_logger')
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -68,7 +95,7 @@ def _chunk_list(listobj, chunksize):
 
 def get_paths(scanname, foldername=None, year=date.today().year, application_number=None, commissioning=None):
     """
-    Function to build filepaths to rawdata and processed data. This function works for the gpfs filesystem of the 
+    Function to build filepaths to rawdata and processed data. This function works for the gpfs filesystem of the
     DESY Maxwell-core cluster. Returns paths to raw an processed data as strings.
 
     :param scanname: <string>
@@ -129,7 +156,7 @@ def get_rawdata(scanlog_content, raw_dir, verbose=False):
     counter = float(0)
     projlist, flatlist, darklist = list(), list(), list()
     proj_metadata = list()
- 
+
     for image_number, logcontent in sorted(imageinfo.items()):
         if verbose:
             counter += 1
@@ -233,7 +260,7 @@ def correrlate_flat(proj, flat, verbose=False):
 def normalize_corr(proj, flat, dark, flat_with_min, cutoff=None, ncore=None, out=None):
     """
     Normalize raw projection data based on best correlation between projections and flat field images
-    
+
     :param proj: <ndarray>
         3D stack of projections
     :param flat: <ndarray>
@@ -296,14 +323,14 @@ def chunk_reconstruct(chunksize, *args, **kwargs):
 def init_filelog(identifier, scanname, recodir):
     """
     Initializes a logger for reconstruction.
-    
+
     :param identifier: <int> or <str>
         application_number or commissiong identifier of the current project
     :param scanname: <str>
         Scanname as in the raw data
     :param recodir: <str>
         path to the reconstruction folder
-        
+
     :return <instance>
         logger instance
     """

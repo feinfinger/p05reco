@@ -1,5 +1,5 @@
-from p05tools.file.read_dat import read_dat
-from p05tools.file.parse_scanlog import parse_scanlog
+from p05reco.lib import read_dat
+from p05reco.lib import scanlog
 import h5py
 import os
 import errno
